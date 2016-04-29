@@ -21,11 +21,15 @@ bool Player::initialise()
 	p_object_->setScale(64.f, 64.f);
 	//p_object_->setFillColor(sf::Color::Blue);
 
-	velocity_.x = MAX_HORIZONTAL_SPEED;
+	p_object_->setTexture(&texture_);
+	p_object_->setTextureRect(sf::FloatRect(0, 0, 128, 128));
+
+	velocity_.x = START_HORIZONTAL_SPEED;
 
 	if (!texture_.loadFromFile("res//spaceship.png"))
 		return(false);
 	p_object_->setTexture(&texture_);
+
 	return(true);
 }
 
@@ -35,6 +39,8 @@ void Player::update(float delta)
 	stepVelocity(delta);
 
 	p_object_->move(velocity_ * delta);
+	if (velocity_.x < MAX_HORIZONTAL_SPEED)
+		velocity_.x += 0.1f;
 
 	force_ = sf::Vector2f(0.f, 0.f);
 }
@@ -45,7 +51,7 @@ void Player::events(const sf::Event& evnt)
 	{
 		if (verticalAllowed_ && evnt.key.code == sf::Keyboard::Space)
 		{
-			applyForce(sf::Vector2f(0.f, ((-gravity_.y * 85) * mass_))); //* 71.5f));
+			applyForce(sf::Vector2f(0.f, ((-gravity_.y * 200) * mass_))); //* 71.5f));
 			verticalAllowed_ = false;
 		}
 	}
@@ -85,7 +91,7 @@ void Player::stepVelocity(float delta)
 
 	velocity_ += (invMass_ * force_) * delta; //Increment the velocity by the overall acceleration acting upon the player 
 	//printf("\nVel Before: %f", velocity_.y);
-	velocity_.y = clamp(velocity_.y, gravity_.y / 4, -gravity_.y / 4);
+	velocity_.y = clamp(velocity_.y, gravity_.y / 4, -gravity_.y / 3);
 	//printf("\nVel After: %f", velocity_.y);
 
 }
