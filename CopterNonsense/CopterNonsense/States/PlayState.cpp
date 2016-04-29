@@ -42,6 +42,12 @@ bool PlayState::init()
 	deathText_.setCharacterSize(72);
 	deathText_.setString("You died! R to retry");
 	deathText_.setColor(sf::Color::White);
+	
+	//Debug purposes
+	/*sf::View v(p_rtexture_->getView());
+	v.zoom(10);
+	p_rtexture_->setView(v);*/
+	//Debug purposes
 	return(true);
 }
 
@@ -83,6 +89,7 @@ void PlayState::update(float delta)
 void PlayState::handleEvent(const sf::Event& evnt)
 {
 	player_.events(evnt);
+
 	if (evnt.type == sf::Event::KeyPressed)
 	{
 		if (evnt.key.code == sf::Keyboard::P) //|| evnt.key.code == sf::Keyboard::Escape)
@@ -200,6 +207,7 @@ void PlayState::translateView(float delta)
 
 void PlayState::resetGame()
 {
+	map_.generateMap();
 	player_.resetForce();
 	player_.setPosition(map_.getPlayerStartLocation());
 	//sf::View v(p_rtexture_->getView());

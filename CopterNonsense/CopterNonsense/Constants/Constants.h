@@ -19,7 +19,7 @@ namespace GameConstants
 
 	namespace Map
 	{
-		const size_t MAP_WIDTH(100);
+		const size_t MAP_WIDTH(250);
 		const size_t MAP_HEIGHT(12);
 		const size_t TILESIZE(64);
 	}
