@@ -80,6 +80,12 @@ void GameObject::setTexture(const sf::Texture* texture)
 {//Set the texture pointer to a new pointer
 	assert(texture);//sanity check: texture not null
 	texture_ = texture;
+	sf::FloatRect rect;
+	rect.left = 0;
+	rect.top = 0;
+	rect.width = static_cast<float> (texture->getSize().x);
+	rect.height = static_cast<float> (texture->getSize().y);
+	setTextureRect(rect);
 }
 
 void GameObject::setTextureRect(const sf::FloatRect& rect)
