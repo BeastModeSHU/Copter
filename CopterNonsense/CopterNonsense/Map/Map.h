@@ -33,6 +33,7 @@ private:
 	const int DIREC_SIZE = 8;
 	sf::VertexArray vertexArray_;
 	sf::Texture* p_tileset_;
+	sf::Texture tileset_;
 	int blockedMap_[GameConstants::Map::MAP_WIDTH][GameConstants::Map::MAP_HEIGHT];
 	static sf::Vector2i DIRECTIONS[8];
 	sf::Vector2f playerStart_;

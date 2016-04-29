@@ -13,6 +13,10 @@ Map::Map()
 	vertexArray_.setPrimitiveType(sf::Quads);
 	vertexArray_.resize(MAP_WIDTH * MAP_HEIGHT * 4);
 	srand(static_cast<unsigned>(time(0)));
+
+	if (!tileset_.loadFromFile("res//tiles.png"))
+	{
+	}
 }
 
 Map::~Map()
@@ -23,6 +27,9 @@ Map::~Map()
 //Public functions
 void Map::generateMap()
 {
+	vertexArray_.clear();
+	vertexArray_.resize(MAP_WIDTH * MAP_HEIGHT * 4);
+
 	setupBlockedMap();
 	initVertArray();
 }
@@ -30,8 +37,8 @@ void Map::generateMap()
 void Map::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
 	states.transform *= getTransform();
-	if (p_tileset_ != nullptr)
-		states.texture = p_tileset_;
+	//if (p_tileset_ != nullptr)
+	states.texture = &tileset_;
 	target.draw(vertexArray_, states);
 }
 
@@ -173,16 +180,26 @@ void Map::initVertArray()
 			switch (blockedMap_[i][j])
 			{
 			case BLOCKED_TILE:
+				if (blockedMap_[i][j - 1] != BLOCKED_TILE)//if tile above is free (top of terrain)
+				{
+					tile[0].texCoords = sf::Vector2f(0, 0);
+					tile[1].texCoords = sf::Vector2f(64, 0);
+					tile[2].texCoords = sf::Vector2f(64, 64);
+					tile[3].texCoords = sf::Vector2f(0, 64);
+				}
+				else
+				{
+					tile[0].texCoords = sf::Vector2f(64, 0);
+					tile[1].texCoords = sf::Vector2f(128, 0);
+					tile[2].texCoords = sf::Vector2f(128, 64);
+					tile[3].texCoords = sf::Vector2f(64, 64);
+				}
+				break;
+			case FREE_TILE:
 				tile[0].color = sf::Color::Cyan;
 				tile[1].color = sf::Color::Cyan;
 				tile[2].color = sf::Color::Cyan;
 				tile[3].color = sf::Color::Cyan;
-				break;
-			case FREE_TILE:
-				tile[0].color = sf::Color::Green;
-				tile[1].color = sf::Color::Green;
-				tile[2].color = sf::Color::Green;
-				tile[3].color = sf::Color::Green;
 				break;
 			}
 		}
