@@ -11,6 +11,10 @@ Map::Map()
 	vertexArray_.setPrimitiveType(sf::Quads);
 	vertexArray_.resize(MAP_WIDTH * MAP_HEIGHT * 4);
 	srand(static_cast<unsigned>(time(0)));
+
+	if (!tileset_.loadFromFile("res//tiles.png"))
+	{
+	}
 }
 
 Map::~Map()
@@ -28,8 +32,8 @@ void Map::generateMap()
 void Map::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
 	states.transform *= getTransform();
-	if (p_tileset_ != nullptr)
-		states.texture = p_tileset_;
+	//if (p_tileset_ != nullptr)
+	states.texture = &tileset_;
 	target.draw(vertexArray_, states);
 }
 
@@ -155,16 +159,30 @@ void Map::initVertArray()
 			switch (blockedMap_[i][j])
 			{
 			case BLOCKED_TILE:
+				/*if (blockedMap_[i][j - 1] != BLOCKED_TILE)
+				{
+					tile[0].texCoords = sf::Vector2f(0, 0);
+					tile[1].texCoords = sf::Vector2f(64, 0);
+					tile[2].texCoords = sf::Vector2f(64, 64);
+					tile[3].texCoords = sf::Vector2f(0, 64);
+				}*/
+				//else
+				{
+					tile[0].texCoords = sf::Vector2f(64, 0);
+					tile[1].texCoords = sf::Vector2f(128, 0);
+					tile[2].texCoords = sf::Vector2f(128, 64);
+					tile[3].texCoords = sf::Vector2f(64, 64);
+				}
+				/*tile[0].color = sf::Color::Cyan;
+				tile[1].color = sf::Color::Cyan;
+				tile[2].color = sf::Color::Cyan;
+				tile[3].color = sf::Color::Cyan;*/
+				break;
+			case FREE_TILE:
 				tile[0].color = sf::Color::Cyan;
 				tile[1].color = sf::Color::Cyan;
 				tile[2].color = sf::Color::Cyan;
 				tile[3].color = sf::Color::Cyan;
-				break;
-			case FREE_TILE:
-				tile[0].color = sf::Color::Green;
-				tile[1].color = sf::Color::Green;
-				tile[2].color = sf::Color::Green;
-				tile[3].color = sf::Color::Green;
 				break;
 			}
 		}
@@ -174,7 +192,7 @@ void Map::initVertArray()
 bool Map::isCollidingWithMap(const sf::FloatRect& collider) const
 {
 	sf::Vector2i pos, tileToCheck;
-	sf::FloatRect r; 
+	sf::FloatRect r;
 	r.width = TILESIZE;
 	r.height = TILESIZE;
 
@@ -188,7 +206,7 @@ bool Map::isCollidingWithMap(const sf::FloatRect& collider) const
 		if (tileToCheck.x >= 0 && tileToCheck.x < MAP_WIDTH &&
 			tileToCheck.y >= 0 && tileToCheck.y < MAP_HEIGHT)
 		{
-			r.left = tileToCheck.x * TILESIZE; 
+			r.left = tileToCheck.x * TILESIZE;
 			r.top = tileToCheck.y * TILESIZE;
 
 			if (blockedMap_[tileToCheck.x][tileToCheck.y] == BLOCKED_TILE && r.intersects(collider))
