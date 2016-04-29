@@ -19,9 +19,13 @@ Player::~Player()
 bool Player::initialise()
 {
 	p_object_->setScale(64.f, 64.f);
-	p_object_->setFillColor(sf::Color::Blue);
+	//p_object_->setFillColor(sf::Color::Blue);
 
 	velocity_.x = MAX_HORIZONTAL_SPEED;
+
+	if (!texture_.loadFromFile("res//spaceship.png"))
+		return(false);
+	p_object_->setTexture(&texture_);
 	return(true);
 }
 
@@ -58,6 +62,16 @@ void Player::events(const sf::Event& evnt)
 void Player::setPosition(sf::Vector2f position)
 {
 	p_object_->setPosition(position);
+}
+
+sf::FloatRect Player::getGlobalBounds() const
+{
+	sf::FloatRect bounds;
+	bounds.width = 64;
+	bounds.height = 27;
+	bounds.left = (p_object_->getPosition().x + (p_object_->getGlobalBounds().width / 2.f)) - bounds.width / 2.f;
+	bounds.top = (p_object_->getPosition().y + (p_object_->getGlobalBounds().height / 2.f)) - bounds.height / 2.f;
+	return(bounds);
 }
 
 //Private Functions 
