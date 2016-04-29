@@ -33,6 +33,7 @@ bool PlayState::init()
 	if (!font_.loadFromFile("res//fonts//Seriphim.ttf"))
 		return(false);
 
+
 	pauseText_.setFont(font_);
 	pauseText_.setCharacterSize(72);
 	pauseText_.setString("Game Paused!");
@@ -42,6 +43,7 @@ bool PlayState::init()
 	deathText_.setCharacterSize(72);
 	deathText_.setString("You died! R to retry");
 	deathText_.setColor(sf::Color::White);
+
 	
 	//Debug purposes
 	/*sf::View v(p_rtexture_->getView());
@@ -188,7 +190,9 @@ void PlayState::initViewPosition()
 {
 	sf::View view(p_rtexture_->getView());
 	float centreX(player_.getPosition().x + player_.getGlobalBounds().width / 2.f);
+	//float centreY(player_.getPosition().y);
 
+	//view.setCenter(centreX, centreY);
 	view.setCenter(centreX, GameConstants::Window::WINDOW_HEIGHT / 2);
 
 	p_rtexture_->setView(view);
