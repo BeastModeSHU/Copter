@@ -91,7 +91,7 @@ void Player::stepVelocity(float delta)
 
 	velocity_ += (invMass_ * force_) * delta; //Increment the velocity by the overall acceleration acting upon the player 
 	//printf("\nVel Before: %f", velocity_.y);
-	velocity_.y = clamp(velocity_.y, gravity_.y / 2, -gravity_.y / 4);
+	velocity_.y = clamp(velocity_.y, gravity_.y / 2, -gravity_.y / 3);
 	//printf("\nVel After: %f", velocity_.y);
 
 }
