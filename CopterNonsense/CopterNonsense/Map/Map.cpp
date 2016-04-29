@@ -2,9 +2,11 @@
 
 using namespace GameConstants::Map;
 
-sf::Vector2i Map::DIRECTIONS[8] = { sf::Vector2i(-1, -1), sf::Vector2i(0, -1), sf::Vector2i(1, -1),
-sf::Vector2i(1, 0), sf::Vector2i(1, 1), sf::Vector2i(0, 1),
-sf::Vector2i(-1, 1), sf::Vector2i(-1, 0) };
+sf::Vector2i Map::DIRECTIONS[8] = {
+	sf::Vector2i(-1, -1), sf::Vector2i(0, -1), sf::Vector2i(1, -1),
+	sf::Vector2i(1, 0), sf::Vector2i(1, 1), sf::Vector2i(0, 1),
+	sf::Vector2i(-1, 1), sf::Vector2i(-1, 0)
+};
 
 Map::Map()
 {
@@ -42,16 +44,23 @@ bool Map::isTerrainCollision(const sf::FloatRect& collider) const
 void Map::setupBlockedMap()
 { //Function to randomly generate a map
 
+	const int X_RANGE(3);
 	int minY(0), maxY(0);
 
-	minY = getMinY(minY); //set the lowest y-value to dip to 
-	maxY = getMaxY(maxY); //set the heighest y-value to rise to 
+	minY = getMinY(minY); //set the lowest y value to dip to 
+	maxY = getMaxY(maxY); //set the heighest y value to rise to 
 
 	fillMapBlocked(); //Fill the map as blocked tiles 
 
-	int lastY = minY + maxY / 2; //
-	playerStart_.x = 0;
-	playerStart_.y = lastY * TILESIZE;
+	int lastY = minY + maxY / 2; //set the start location of the crawler to the mid-point between min and max y 
+
+	playerStart_.x = 0; //Set the player's x to 0
+	playerStart_.y = lastY * TILESIZE; //Set their y location to the start y value
+
+	//set the start tile to unblocked
+	blockedMap_[0][lastY] = FREE_TILE;
+
+	//pad out the area around the start tile so that the player can fit through
 	for (int j(0); j < 4; ++j)
 	{
 		if (lastY + j < MAP_HEIGHT - 1)
@@ -61,13 +70,25 @@ void Map::setupBlockedMap()
 			blockedMap_[0][lastY - j] = FREE_TILE;
 	}
 
-	blockedMap_[0][lastY] = FREE_TILE;
 
-	int direc = 1;
+	int direc;
+	//randomly pick whether to travel upwards or downwards
 
+	(rand() % 100) + 1 > 50 ? direc = 1 : direc = -1;
+	
+
+	int xDistance((rand() % X_RANGE) + 1);
+	int xDifference(0);
+	int y = lastY + direc;
 	for (int i(1); i < MAP_WIDTH; ++i)
 	{
-		int y = lastY + direc;
+		if (xDistance - xDifference <= 0)
+		{
+			xDifference = (rand() % X_RANGE) + 1;
+			y = lastY + direc;
+			xDifference = 0;
+		}
+		//int y = lastY + direc;
 
 		if (y < minY)
 		{
@@ -92,6 +113,7 @@ void Map::setupBlockedMap()
 		}
 
 		lastY = y;
+		++xDifference;
 	}
 
 	for (size_t i(1); i < MAP_WIDTH - 1; ++i) //Redundant to check the first and last tile of x 
@@ -101,11 +123,7 @@ void Map::setupBlockedMap()
 
 			if (blockedMap_[i - 1][j] == FREE_TILE && blockedMap_[i][j] == BLOCKED_TILE && blockedMap_[i + 1][j] == FREE_TILE)
 				blockedMap_[i][j] = FREE_TILE;
-
-			if (blockedMap_[i - 1][j] == BLOCKED_TILE && blockedMap_[i][j] == BLOCKED_TILE && blockedMap_[i + 1][j] == BLOCKED_TILE
-				&& blockedMap_[i][j + 1] == FREE_TILE);
 		}
-
 	}
 }
 
@@ -174,7 +192,7 @@ void Map::initVertArray()
 bool Map::isCollidingWithMap(const sf::FloatRect& collider) const
 {
 	sf::Vector2i pos, tileToCheck;
-	sf::FloatRect r; 
+	sf::FloatRect r;
 	r.width = TILESIZE;
 	r.height = TILESIZE;
 
@@ -188,7 +206,7 @@ bool Map::isCollidingWithMap(const sf::FloatRect& collider) const
 		if (tileToCheck.x >= 0 && tileToCheck.x < MAP_WIDTH &&
 			tileToCheck.y >= 0 && tileToCheck.y < MAP_HEIGHT)
 		{
-			r.left = tileToCheck.x * TILESIZE; 
+			r.left = tileToCheck.x * TILESIZE;
 			r.top = tileToCheck.y * TILESIZE;
 
 			if (blockedMap_[tileToCheck.x][tileToCheck.y] == BLOCKED_TILE && r.intersects(collider))
