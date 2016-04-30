@@ -16,7 +16,6 @@ Game::~Game()
 bool Game::init()
 {
 	window_.create(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), WINDOW_TITLE, sf::Style::Close, CONTEXT_SETTINGS); //Create a window 
-
 	states_.push_back(new PlayState(&window_, &rTexture_)); //Push the play state into the list of states
 	//states_.push_back(new MenuState(&window_, &rTexture_)); //Push the menu state into the list of states
 

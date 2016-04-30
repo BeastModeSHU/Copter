@@ -9,6 +9,7 @@
 #include "..\Utils\TextureManager.h"
 #include "..\GameObject\GameObject.h"
 #include "..\Entities\Player.h"
+#include "..\Entities\Bullet.h"
 #include "..\Map\Map.h"
 
 using namespace std;
@@ -42,10 +43,12 @@ private:
 	TextureManager* p_texMngr_;
 	vector<GameObject*> p_objects_;
 	Player player_;
+	vector<Bullet> bullets_;
 	Map map_;
 	sf::Font font_;
 	sf::Text pauseText_;
 	sf::Text deathText_; 
+	sf::Vector2f mouseWorldPos_;
 	int collTick_ = 0;
 	enum GameplayState
 	{

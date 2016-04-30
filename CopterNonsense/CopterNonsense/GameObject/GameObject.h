@@ -32,8 +32,10 @@ public:
 	void setTexture(const sf::Texture*);
 	void setTextureRect(const sf::FloatRect& rect); //set the area of the texture we want to be displayed on the shape
 	void setFillColor(sf::Color);
+	void setAlive(bool);
 	sf::FloatRect getLocalBounds() const;
 	sf::FloatRect getGlobalBounds() const;
+	bool getAlive() const { return alive_; }
 
 	//Get what type of shape this game object is (determines it's collider)
 	GameObjectPrimitive getObjectPrimitive() const{ return (shape_); }
@@ -73,7 +75,7 @@ private:
 	const sf::Texture* texture_; //The texture that will be applied to the 
 	sf::CircleShape circleShape_;	 //For ease, use the SFML circle shape
 	sf::Vector2f velocity_;
-	
+	bool alive_;
 
 	//Animation stuff
 	const Animation* animation_;

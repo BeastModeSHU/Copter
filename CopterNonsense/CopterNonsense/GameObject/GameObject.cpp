@@ -146,6 +146,11 @@ void GameObject::setFillColor(sf::Color col)
 	}
 }
 
+void GameObject::setAlive(bool b)
+{
+	alive_ = b;
+}
+
 void GameObject::setAnimation(const Animation& a)
 {
 	animation_ = &a;

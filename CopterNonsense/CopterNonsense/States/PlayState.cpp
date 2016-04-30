@@ -26,6 +26,16 @@ bool PlayState::init()
 	player_.setGameObject(p_objects_.back());
 	player_.initialise();
 	player_.setPosition(map_.getPlayerStartLocation());
+
+	bullets_.resize(GameConstants::Gameplay::MAX_BULLETS);
+
+	for (int i(0); i < GameConstants::Gameplay::MAX_BULLETS; ++i)
+	{
+		p_objects_.push_back(new GameObject());
+		bullets_[i].setGameObject(p_objects_.back());
+		bullets_[i].initialise();
+	}
+
 	initViewPosition();
 
 	gameplayState_ = Playing;
@@ -44,7 +54,7 @@ bool PlayState::init()
 	deathText_.setString("You died! R to retry");
 	deathText_.setColor(sf::Color::White);
 
-	
+
 	//Debug purposes
 	/*sf::View v(p_rtexture_->getView());
 	v.zoom(10);
@@ -58,7 +68,8 @@ void PlayState::draw() const
 	p_rtexture_->draw(map_);
 
 	for (GameObject* obj : p_objects_)
-		p_rtexture_->draw(*obj);
+		if (obj->getAlive())
+			p_rtexture_->draw(*obj);
 
 	switch (gameplayState_)
 	{
@@ -73,6 +84,18 @@ void PlayState::draw() const
 
 void PlayState::update(float delta)
 {
+	sf::Vector2i mousePos = sf::Mouse::getPosition(*p_window_);
+	mouseWorldPos_ = p_rtexture_->mapPixelToCoords(mousePos);
+	for (int i(0); i < GameConstants::Gameplay::MAX_BULLETS; ++i)
+	{
+		bullets_[i].update(delta);
+		if (map_.isTerrainCollision(bullets_[i].getGlobalBounds()) && bullets_[i].getAlive())
+		{
+			bullets_[i].setAlive(false);
+		}
+	}
+
+
 	switch (gameplayState_)
 	{
 	case Playing:
@@ -94,6 +117,25 @@ void PlayState::handleEvent(const sf::Event& evnt)
 
 	if (evnt.type == sf::Event::KeyPressed)
 	{
+		if (evnt.key.code == sf::Keyboard::M)
+		{
+			sf::Vector2f pos(player_.getPosition().x + player_.getGlobalBounds().width / 2, player_.getPosition().y + player_.getGlobalBounds().height / 2);
+			sf::Vector2f rot(subtract(mouseWorldPos_, pos));
+
+			bool found(false);
+			for (int i(0); i < GameConstants::Gameplay::MAX_BULLETS; ++i)
+			{
+				if (!bullets_[i].getAlive() && !found)
+				{
+					bullets_[i].setup(rot, pos);
+					found = true;
+				}
+			}
+		}
+	}
+
+	if (evnt.type == sf::Event::KeyPressed)
+	{
 		if (evnt.key.code == sf::Keyboard::P) //|| evnt.key.code == sf::Keyboard::Escape)
 		{
 			//pause or unpause the game as long as we're not on the death screen
@@ -106,7 +148,7 @@ void PlayState::handleEvent(const sf::Event& evnt)
 	{
 	case Playing:
 	{
-		
+
 	}
 	break;
 
@@ -218,5 +260,5 @@ void PlayState::resetGame()
 	//v.setCenter(player_.getPosition().x - player_.getGlobalBounds().width / 2.f, v.getCenter().y);
 	//p_rtexture_->setView(v);
 	initViewPosition();
-	
+
 }
