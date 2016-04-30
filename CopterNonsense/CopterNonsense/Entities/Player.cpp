@@ -29,6 +29,7 @@ bool Player::initialise()
 	if (!texture_.loadFromFile("res//spaceship.png"))
 		return(false);
 	p_object_->setTexture(&texture_);
+	p_object_->setAlive(true);
 
 	return(true);
 }

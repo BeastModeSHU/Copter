@@ -14,7 +14,7 @@ Map::Map()
 	vertexArray_.resize(MAP_WIDTH * MAP_HEIGHT * 4);
 	srand(static_cast<unsigned>(time(0)));
 
-	if (!tileset_.loadFromFile("res//tiles.png"))
+	if (!tileset_.loadFromFile("res//tiles2.png"))
 	{
 	}
 }
@@ -186,6 +186,13 @@ void Map::initVertArray()
 					tile[1].texCoords = sf::Vector2f(64, 0);
 					tile[2].texCoords = sf::Vector2f(64, 64);
 					tile[3].texCoords = sf::Vector2f(0, 64);
+				}
+				else if (blockedMap_[i][j + 1] != BLOCKED_TILE)//if the tile below if free (bottom of terrain)
+				{
+					tile[0].texCoords = sf::Vector2f(128, 0);
+					tile[1].texCoords = sf::Vector2f(192, 0);
+					tile[2].texCoords = sf::Vector2f(192, 64);
+					tile[3].texCoords = sf::Vector2f(128, 64);
 				}
 				else
 				{

@@ -71,6 +71,11 @@ inline sf::Vector2f RotateVector(sf::Vector2f v, float angle)
 	return(sf::Vector2f(x, y));
 }
 
+inline sf::Vector2f subtract(sf::Vector2f a, sf::Vector2f b)
+{
+	return(sf::Vector2f(a.x - b.x, a.y - b.y));
+}
+
 
 inline float clamp(float value, float max, float min)
 {
