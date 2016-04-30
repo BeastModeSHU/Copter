@@ -14,7 +14,7 @@ namespace GameConstants
 
 	namespace Gameplay
 	{
-
+		const size_t MAX_BULLETS(5);
 	}
 
 	namespace Map
