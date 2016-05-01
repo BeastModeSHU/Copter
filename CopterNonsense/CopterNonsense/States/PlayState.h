@@ -49,6 +49,8 @@ private:
 	sf::Text pauseText_;
 	sf::Text deathText_; 
 	sf::Vector2f mouseWorldPos_;
+	sf::RectangleShape inverseGrav_;
+	int gravity_ = 1;
 	int collTick_ = 0;
 	enum GameplayState
 	{

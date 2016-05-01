@@ -1,5 +1,5 @@
 #include "Map.h"
-
+#include <iostream>
 using namespace GameConstants::Map;
 
 sf::Vector2i Map::DIRECTIONS[8] = {
@@ -10,6 +10,14 @@ sf::Vector2i Map::DIRECTIONS[8] = {
 
 Map::Map()
 {
+	red_ = sf::Vector3f(255, 0, 0);
+	blue_ = sf::Vector3f(0, 255, 0);
+	green_ = sf::Vector3f(0, 0, 255);
+	startColour_ = red_;
+	endColour_ = blue_;
+	needNewColour_ = false;
+	t_ = 0;
+
 	vertexArray_.setPrimitiveType(sf::Quads);
 	vertexArray_.resize(MAP_WIDTH * MAP_HEIGHT * 4);
 	srand(static_cast<unsigned>(time(0)));
@@ -32,6 +40,84 @@ void Map::generateMap()
 
 	setupBlockedMap();
 	initVertArray();
+}
+
+void Map::lerpColours(float delta, const sf::Vector2f& playerPos)
+{
+	t_ += (delta/2);
+	if (needNewColour_)
+	{
+		startColour_ = endColour_;
+		sf::Vector3f newColour_;
+		bool found(false);
+		while (!found)
+		{
+			int randNum = rand() % 3;
+			switch (randNum)
+			{
+			case 0:
+				if (endColour_ != red_)
+				{
+					newColour_ = red_;
+					found = true;
+				}
+				break;
+			case 1:
+				if (endColour_ != blue_)
+				{
+					newColour_ = blue_;
+					found = true;
+				}
+				break;
+			case 2:
+				if (endColour_ != green_)
+				{
+					newColour_ = green_;
+					found = true;
+				}
+				break;
+
+			}
+		}
+
+		endColour_ = newColour_;
+		needNewColour_ = false;
+	}
+	else
+	{
+		sf::Vector3f colour = startColour_ + t_ * (endColour_ - startColour_);
+		currentCol_ = colour;
+		sf::Vector2i pos(playerPos.x / TILESIZE, playerPos.y / TILESIZE);
+
+		//for (size_t i(pos.x - 10); i < pos.x + 10; ++i)
+		for (size_t i(0); i < MAP_WIDTH; ++i)
+		{
+			for (size_t j(0); j < MAP_HEIGHT; ++j)
+			{
+				const int tileID(i + j * MAP_WIDTH);
+
+				sf::Vertex* tile = &vertexArray_[tileID * 4];
+				switch (blockedMap_[i][j])
+				{
+				case BLOCKED_TILE:
+					tile[0].color = sf::Color(colour.x, colour.y, colour.z);
+					tile[1].color = sf::Color(colour.x, colour.y, colour.z);
+					tile[2].color = sf::Color(colour.x, colour.y, colour.z);
+					tile[3].color = sf::Color(colour.x, colour.y, colour.z);
+
+					break;
+				}
+
+			}
+		}
+
+		if (colour == endColour_ || t_ > 1)
+		{
+			needNewColour_ = true;
+			t_ = 0;
+		}
+
+	}
 }
 
 void Map::draw(sf::RenderTarget& target, sf::RenderStates states) const
@@ -82,7 +168,7 @@ void Map::setupBlockedMap()
 	//randomly pick whether to travel upwards or downwards
 
 	(rand() % 100) + 1 > 50 ? direc = 1 : direc = -1;
-	
+
 
 	int xDistance((rand() % X_RANGE) + 1);
 	int xDifference(0);
@@ -180,6 +266,10 @@ void Map::initVertArray()
 			switch (blockedMap_[i][j])
 			{
 			case BLOCKED_TILE:
+				tile[0].color = sf::Color::White;
+				tile[1].color = sf::Color::White;
+				tile[2].color = sf::Color::White;
+				tile[3].color = sf::Color::White;
 				if (blockedMap_[i][j - 1] != BLOCKED_TILE)//if tile above is free (top of terrain)
 				{
 					tile[0].texCoords = sf::Vector2f(0, 0);
@@ -203,10 +293,10 @@ void Map::initVertArray()
 				}
 				break;
 			case FREE_TILE:
-				tile[0].color = sf::Color::Cyan;
-				tile[1].color = sf::Color::Cyan;
-				tile[2].color = sf::Color::Cyan;
-				tile[3].color = sf::Color::Cyan;
+				tile[0].color = sf::Color::Transparent;
+				tile[1].color = sf::Color::Transparent;
+				tile[2].color = sf::Color::Transparent;
+				tile[3].color = sf::Color::Transparent;
 				break;
 			}
 		}

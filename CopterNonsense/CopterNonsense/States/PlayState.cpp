@@ -54,6 +54,11 @@ bool PlayState::init()
 	deathText_.setString("You died! R to retry");
 	deathText_.setColor(sf::Color::White);
 
+	inverseGrav_.setFillColor(sf::Color::White);
+	inverseGrav_.setSize(sf::Vector2f(1500, 720));
+	inverseGrav_.setScale(1, 1);
+	inverseGrav_.setPosition(1000, 0);
+
 
 	//Debug purposes
 	/*sf::View v(p_rtexture_->getView());
@@ -65,6 +70,7 @@ bool PlayState::init()
 
 void PlayState::draw() const
 {
+	p_rtexture_->draw(inverseGrav_);
 	p_rtexture_->draw(map_);
 
 	for (GameObject* obj : p_objects_)
@@ -189,12 +195,23 @@ void PlayState::handleInput(float delta)
 //update related functions 
 void PlayState::updatePlaying(float delta)
 {
-	player_.update(delta);
+	player_.update(delta,map_.currentCol_, gravity_);
 	translateView(delta);
+	map_.lerpColours(delta, player_.getPosition());
 
 	if (map_.isTerrainCollision(player_.getGlobalBounds()))
 	{
 		gameplayState_ = DeathScreen;
+	}
+	if (player_.getGlobalBounds().intersects(inverseGrav_.getGlobalBounds()))
+	{
+		if (gravity_ != -1)
+			gravity_ = -1;
+	}
+	else
+	{
+		if (gravity_ != 1)
+			gravity_ = 1;
 	}
 }
 
