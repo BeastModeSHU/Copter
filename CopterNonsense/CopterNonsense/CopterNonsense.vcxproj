@@ -73,6 +73,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Entities\AntiGrav.cpp" />
     <ClCompile Include="Entities\Bullet.cpp" />
     <ClCompile Include="GameObject\GameObject.cpp" />
     <ClCompile Include="Game\Game.cpp" />
@@ -87,6 +88,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Constants\Constants.h" />
+    <ClInclude Include="Entities\AntiGrav.h" />
     <ClInclude Include="Entities\Bullet.h" />
     <ClInclude Include="GameObject\GameObject.h" />
     <ClInclude Include="Game\Game.h" />

@@ -21,14 +21,13 @@ bool Player::initialise()
 	p_object_->setScale(64.f, 64.f);
 	//p_object_->setFillColor(sf::Color::Blue);
 
-	p_object_->setTexture(&texture_);
-	p_object_->setTextureRect(sf::FloatRect(0, 0, 128, 128));
 
 	velocity_.x = START_HORIZONTAL_SPEED;
 
 	if (!texture_.loadFromFile("res//spaceship.png"))
 		return(false);
 	p_object_->setTexture(&texture_);
+	//p_object_->setTextureRect(sf::FloatRect(0, 0, 128, 128));
 	p_object_->setAlive(true);
 
 	return(true);

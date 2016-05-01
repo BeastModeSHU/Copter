@@ -26,7 +26,7 @@ private:
 	void stepForces();
 	void stepVelocity(float);
 private:
-	const float MAX_HORIZONTAL_SPEED = 500.f;
+	const float MAX_HORIZONTAL_SPEED = 700.f;
 	const float START_HORIZONTAL_SPEED = 250.f;
 	GameObject* p_object_;
 	sf::Vector2f force_;

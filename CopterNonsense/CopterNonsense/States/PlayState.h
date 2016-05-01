@@ -10,6 +10,7 @@
 #include "..\GameObject\GameObject.h"
 #include "..\Entities\Player.h"
 #include "..\Entities\Bullet.h"
+#include "..\Entities\AntiGrav.h"
 #include "..\Map\Map.h"
 
 using namespace std;
@@ -31,6 +32,8 @@ private:
 	void initViewPosition();
 	void translateView(float delta);
 
+	void setAntiGravPositions();
+
 	void updatePlaying(float delta);
 	void updatePaused(float delta);
 	void updateDeathScreen(float delta);
@@ -44,6 +47,7 @@ private:
 	vector<GameObject*> p_objects_;
 	Player player_;
 	vector<Bullet> bullets_;
+	vector<AntiGrav> antiGravs_;
 	Map map_;
 	sf::Font font_;
 	sf::Text pauseText_;

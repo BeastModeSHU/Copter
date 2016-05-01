@@ -19,6 +19,17 @@ PlayState::~PlayState()
 
 bool PlayState::init()
 {
+	
+	antiGravs_.resize(GameConstants::Gameplay::MAX_ANTIGRAV);
+	for (int i(0); i < GameConstants::Gameplay::MAX_ANTIGRAV; ++i)
+	{
+		p_objects_.push_back(new GameObject());
+		antiGravs_[i].setGameObject(p_objects_.back());
+		antiGravs_[i].initialise();
+	}
+	setAntiGravPositions();
+
+
 	map_.generateMap();
 
 	p_objects_.push_back(new GameObject());
@@ -54,11 +65,6 @@ bool PlayState::init()
 	deathText_.setString("You died! R to retry");
 	deathText_.setColor(sf::Color::White);
 
-	inverseGrav_.setFillColor(sf::Color::White);
-	inverseGrav_.setSize(sf::Vector2f(1500, 720));
-	inverseGrav_.setScale(1, 1);
-	inverseGrav_.setPosition(1000, 0);
-
 
 	//Debug purposes
 	/*sf::View v(p_rtexture_->getView());
@@ -70,12 +76,12 @@ bool PlayState::init()
 
 void PlayState::draw() const
 {
-	p_rtexture_->draw(inverseGrav_);
-	p_rtexture_->draw(map_);
-
 	for (GameObject* obj : p_objects_)
 		if (obj->getAlive())
 			p_rtexture_->draw(*obj);
+
+	p_rtexture_->draw(map_);
+
 
 	switch (gameplayState_)
 	{
@@ -195,6 +201,22 @@ void PlayState::handleInput(float delta)
 //update related functions 
 void PlayState::updatePlaying(float delta)
 {
+	bool found(false);
+	for (int i(0); i < GameConstants::Gameplay::MAX_ANTIGRAV; ++i)
+	{
+		if (player_.getGlobalBounds().intersects(antiGravs_[i].getGlobalBounds()))
+		{
+			found = true;
+		}
+	}
+	if (found)
+	{
+		gravity_ = -1;
+	}
+	else
+	{
+		gravity_ = 1;
+	}
 	player_.update(delta,map_.currentCol_, gravity_);
 	translateView(delta);
 	map_.lerpColours(delta, player_.getPosition());
@@ -202,16 +224,6 @@ void PlayState::updatePlaying(float delta)
 	if (map_.isTerrainCollision(player_.getGlobalBounds()))
 	{
 		gameplayState_ = DeathScreen;
-	}
-	if (player_.getGlobalBounds().intersects(inverseGrav_.getGlobalBounds()))
-	{
-		if (gravity_ != -1)
-			gravity_ = -1;
-	}
-	else
-	{
-		if (gravity_ != 1)
-			gravity_ = 1;
 	}
 }
 
@@ -264,6 +276,17 @@ void PlayState::translateView(float delta)
 	view.move(player_.getVelocity().x * delta, 0.f);
 
 	p_rtexture_->setView(view);
+}
+
+void PlayState::setAntiGravPositions()
+{
+	int startX((rand() % 500) + 500);
+	int xJump((rand() % 750) + 2500);
+	for (int i(0); i < antiGravs_.size(); ++i)
+	{
+		antiGravs_[i].setPosition(sf::Vector2f(startX + (xJump * i) , 0));
+		xJump = rand() % 500 + 500;
+	}
 }
 
 //reset game for replay
