@@ -52,10 +52,12 @@ private:
 	sf::Font font_;
 	sf::Text pauseText_;
 	sf::Text deathText_; 
+	sf::Text scoreText_;
 	sf::Vector2f mouseWorldPos_;
-	sf::RectangleShape inverseGrav_;
+	sf::RectangleShape obstacle_;
 	int gravity_ = 1;
 	int collTick_ = 0;
+	float score_;
 	enum GameplayState
 	{
 		Playing, DeathScreen, Paused

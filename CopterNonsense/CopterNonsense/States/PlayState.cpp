@@ -65,6 +65,18 @@ bool PlayState::init()
 	deathText_.setString("You died! R to retry");
 	deathText_.setColor(sf::Color::White);
 
+	scoreText_.setFont(font_);
+	scoreText_.setCharacterSize(42);
+	scoreText_.setString(" SCORE : ");
+	scoreText_.setColor(sf::Color::White);
+	scoreText_.setPosition(p_rtexture_->mapPixelToCoords(sf::Vector2i(GameConstants::Window::WINDOW_WIDTH / 2, 0)));
+	score_ = 0;
+
+	obstacle_.setFillColor(sf::Color::Red);
+	obstacle_.setSize(sf::Vector2f(25, (rand() % 100 + 50)));
+	obstacle_.setPosition(500, (rand() % 400) + 100);
+	obstacle_.setScale(1, 1);
+
 
 	//Debug purposes
 	/*sf::View v(p_rtexture_->getView());
@@ -81,7 +93,8 @@ void PlayState::draw() const
 			p_rtexture_->draw(*obj);
 
 	p_rtexture_->draw(map_);
-
+	p_rtexture_->draw(obstacle_);
+	p_rtexture_->draw(scoreText_);
 
 	switch (gameplayState_)
 	{
@@ -96,8 +109,11 @@ void PlayState::draw() const
 
 void PlayState::update(float delta)
 {
+	scoreText_.setString(" SCORE : " + std::to_string((int)score_));
+
 	sf::Vector2i mousePos = sf::Mouse::getPosition(*p_window_);
 	mouseWorldPos_ = p_rtexture_->mapPixelToCoords(mousePos);
+
 	for (int i(0); i < GameConstants::Gameplay::MAX_BULLETS; ++i)
 	{
 		bullets_[i].update(delta);
@@ -143,6 +159,11 @@ void PlayState::handleEvent(const sf::Event& evnt)
 					found = true;
 				}
 			}
+		}
+		if (evnt.key.code == sf::Keyboard::K)
+		{
+			obstacle_.setPosition(player_.getPosition().x + 500, (rand() % 400) + 100);
+			obstacle_.setSize(sf::Vector2f(25, (rand() % 100 + 50)));
 		}
 	}
 
@@ -201,6 +222,9 @@ void PlayState::handleInput(float delta)
 //update related functions 
 void PlayState::updatePlaying(float delta)
 {
+	score_ += delta * 200;
+	scoreText_.move(player_.getVelocity().x * delta, 0);
+
 	bool found(false);
 	for (int i(0); i < GameConstants::Gameplay::MAX_ANTIGRAV; ++i)
 	{
@@ -295,7 +319,10 @@ void PlayState::resetGame()
 {
 	map_.generateMap();
 	player_.resetForce();
+	player_.resetVelocity();
 	player_.setPosition(map_.getPlayerStartLocation());
+	scoreText_.setPosition(player_.getPosition().x, 0);
+	score_ = 0;
 	//sf::View v(p_rtexture_->getView());
 	//v.setCenter(player_.getPosition().x - player_.getGlobalBounds().width / 2.f, v.getCenter().y);
 	//p_rtexture_->setView(v);

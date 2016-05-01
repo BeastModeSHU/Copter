@@ -17,6 +17,7 @@ public:
 	void events(const sf::Event&);
 	void setPosition(sf::Vector2f);
 	void resetForce() { force_ = sf::Vector2f(0.f, 0.f); }
+	void resetVelocity() { velocity_.x = START_HORIZONTAL_SPEED; }
 	//Accessors
 	sf::Vector2f getPosition() const { return p_object_->getPosition(); };
 	sf::FloatRect getGlobalBounds() const;//{ return p_object_->getGlobalBounds(); }
