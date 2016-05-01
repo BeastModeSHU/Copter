@@ -21,25 +21,34 @@ bool Player::initialise()
 	p_object_->setScale(64.f, 64.f);
 	//p_object_->setFillColor(sf::Color::Blue);
 
-	p_object_->setTexture(&texture_);
-	p_object_->setTextureRect(sf::FloatRect(0, 0, 128, 128));
 
 	velocity_.x = START_HORIZONTAL_SPEED;
 
 	if (!texture_.loadFromFile("res//spaceship.png"))
 		return(false);
 	p_object_->setTexture(&texture_);
+	//p_object_->setTextureRect(sf::FloatRect(0, 0, 128, 128));
 	p_object_->setAlive(true);
 
 	return(true);
 }
 
-void Player::update(float delta)
+void Player::update(float delta, const sf::Vector3f& col, const int g)
 {
+	if (g == 1)
+	{
+		gravity_.y = 981;
+	}
+	else
+	{
+		gravity_.y = -981;
+	}
+	
 	stepForces();
 	stepVelocity(delta);
 
 	p_object_->move(velocity_ * delta);
+	p_object_->setFillColor(sf::Color(col.x, col.y, col.z));
 	if (velocity_.x < MAX_HORIZONTAL_SPEED)
 		velocity_.x += 0.1f;
 
@@ -63,6 +72,10 @@ void Player::events(const sf::Event& evnt)
 		{
 			verticalAllowed_ = true;
 		}
+		if (evnt.key.code == sf::Keyboard::F)
+		{
+			gravity_.y *= -1;
+		}
 	}
 }
 
@@ -78,6 +91,8 @@ sf::FloatRect Player::getGlobalBounds() const
 	bounds.height = 27;
 	bounds.left = (p_object_->getPosition().x + (p_object_->getGlobalBounds().width / 2.f)) - bounds.width / 2.f;
 	bounds.top = (p_object_->getPosition().y + (p_object_->getGlobalBounds().height / 2.f)) - bounds.height / 2.f;
+	/*bounds.left = (p_object_->getPosition().x - bounds.width / 2.f);
+	bounds.top = (p_object_->getPosition().y - bounds.height / 2.f);*/
 	return(bounds);
 }
 
@@ -92,7 +107,10 @@ void Player::stepVelocity(float delta)
 
 	velocity_ += (invMass_ * force_) * delta; //Increment the velocity by the overall acceleration acting upon the player 
 	//printf("\nVel Before: %f", velocity_.y);
-	velocity_.y = clamp(velocity_.y, gravity_.y / 2, -gravity_.y / 3);
+	if (gravity_.y > 0)
+		velocity_.y = clamp(velocity_.y, gravity_.y / 2, -gravity_.y / 3);
+	else
+		velocity_.y = clamp(velocity_.y, -gravity_.y / 2, gravity_.y / 5);
 	//printf("\nVel After: %f", velocity_.y);
 
 }

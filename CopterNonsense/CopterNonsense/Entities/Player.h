@@ -11,7 +11,7 @@ public:
 	//Mutators
 	bool initialise();
 	void setGameObject(GameObject* obj) { p_object_ = obj; }
-	void update(float dtime);
+	void update(float dtime, const sf::Vector3f&, const int);
 	void applyForce(sf::Vector2f force) { force_ += force; }
 	void setGravity(sf::Vector2f g) { gravity_ = g; }
 	void events(const sf::Event&);
@@ -26,8 +26,8 @@ private:
 	void stepForces();
 	void stepVelocity(float);
 private:
-	const float MAX_HORIZONTAL_SPEED = 500.f;
-	const float START_HORIZONTAL_SPEED = 100.f;
+	const float MAX_HORIZONTAL_SPEED = 700.f;
+	const float START_HORIZONTAL_SPEED = 250.f;
 	GameObject* p_object_;
 	sf::Vector2f force_;
 	sf::Vector2f velocity_;
