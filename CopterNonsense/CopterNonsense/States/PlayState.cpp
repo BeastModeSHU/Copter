@@ -257,7 +257,7 @@ void PlayState::updatePlaying(float delta)
 	}
 	player_.update(delta, map_.currentCol_, gravity_);
 	translateView(delta);
-	map_.lerpColours(delta, player_.getPosition());
+	map_.lerpColours(delta, player_.getPosition(), gravity_);
 	for (int i(0); i < GameConstants::Gameplay::MAX_OBSTACLES; ++i)
 	{
 		obstacles_[i].update(map_.currentCol_);
@@ -308,7 +308,7 @@ void PlayState::drawDeathScreen() const
 void PlayState::initViewPosition()
 {
 	sf::View view(p_rtexture_->getView());
-	float centreX(player_.getPosition().x + player_.getGlobalBounds().width / 2.f);
+	float centreX(((player_.getPosition().x) + 400) + player_.getGlobalBounds().width / 2.f);
 	//float centreY(player_.getPosition().y);
 
 	//view.setCenter(centreX, centreY);

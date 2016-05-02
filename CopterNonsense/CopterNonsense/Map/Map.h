@@ -16,7 +16,7 @@ public:
 
 	//Mutators
 	void generateMap();
-	void lerpColours(float delta, const sf::Vector2f&);
+	void lerpColours(float delta, const sf::Vector2f&, const int);
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
 	//Accessors
