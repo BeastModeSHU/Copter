@@ -22,7 +22,7 @@ Map::Map()
 	vertexArray_.resize(MAP_WIDTH * MAP_HEIGHT * 4);
 	srand(static_cast<unsigned>(time(0)));
 
-	if (!tileset_.loadFromFile("res//tiles2.png"))
+	if (!tileset_.loadFromFile("res//tiles.png"))
 	{
 	}
 }

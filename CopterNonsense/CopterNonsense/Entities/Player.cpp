@@ -56,7 +56,7 @@ void Player::update(float delta, const sf::Vector3f& col, const int g)
 	if (velocity_.x < MAX_HORIZONTAL_SPEED)
 		velocity_.x += 0.1f;
 
-	force_ = sf::Vector2f(0.f, 0.f);
+	force_ = sf::Vector2f(0.f, 0.f);	
 }
 
 void Player::events(const sf::Event& evnt)

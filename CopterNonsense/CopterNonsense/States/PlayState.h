@@ -4,6 +4,7 @@
 #include <vector>
 #include <SFML\Audio.hpp>
 #include <SFML\Graphics.hpp>
+#include <time.h>
 
 #include "State.h"
 #include "..\Utils\TextureManager.h"
@@ -39,9 +40,11 @@ private:
 	void updatePlaying(float delta);
 	void updatePaused(float delta);
 	void updateDeathScreen(float delta);
+	void updateWinScreen(float delta);
 	
 	void drawPauseScreen()const;
 	void drawDeathScreen() const;
+	void drawWinScreen() const;
 
 	void resetGame();
 private:
@@ -56,14 +59,18 @@ private:
 	sf::Text pauseText_;
 	sf::Text deathText_; 
 	sf::Text scoreText_;
+	sf::Text highscoreText_;
+	sf::Text winText_;
 	sf::Vector2f mouseWorldPos_;
-	sf::RectangleShape obstacle_;
+	sf::RectangleShape background_;
+	sf::Texture backgroundTexture_;
 	int gravity_ = 1;
 	int collTick_ = 0;
 	float score_;
+	float highscore_;
 	enum GameplayState
 	{
-		Playing, DeathScreen, Paused
+		Playing, DeathScreen, Paused, WinScreen
 	};
 	GameplayState gameplayState_;
 };
