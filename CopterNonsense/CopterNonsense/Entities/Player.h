@@ -34,6 +34,7 @@ private:
 	sf::Vector2f velocity_;
 	sf::Vector2f gravity_;
 	sf::Texture texture_;
+	sf::Texture reverseTexture_;
 	float mass_;
 	float invMass_;
 	bool verticalAllowed_; //Can the vehicle move vertically (for input detection)

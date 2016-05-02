@@ -26,6 +26,8 @@ bool Player::initialise()
 
 	if (!texture_.loadFromFile("res//spaceship.png"))
 		return(false);
+	if (!reverseTexture_.loadFromFile("res//spaceshipReverse.png"))
+		return(false);
 	p_object_->setTexture(&texture_);
 	//p_object_->setTextureRect(sf::FloatRect(0, 0, 128, 128));
 	p_object_->setAlive(true);
@@ -38,10 +40,12 @@ void Player::update(float delta, const sf::Vector3f& col, const int g)
 	if (g == 1)
 	{
 		gravity_.y = 981;
+		p_object_->setTexture(&texture_);
 	}
 	else
 	{
 		gravity_.y = -981;
+		p_object_->setTexture(&reverseTexture_);
 	}
 	
 	stepForces();

@@ -51,6 +51,9 @@
     <ClCompile Include="Entities\AntiGrav.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Entities\Obstacle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="States\State.h">
@@ -90,6 +93,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Entities\AntiGrav.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Entities\Obstacle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
