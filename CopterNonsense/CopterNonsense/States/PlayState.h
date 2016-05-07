@@ -4,6 +4,7 @@
 #include <vector>
 #include <SFML\Audio.hpp>
 #include <SFML\Graphics.hpp>
+#include <time.h>
 
 #include "State.h"
 #include "..\Utils\TextureManager.h"
@@ -11,6 +12,7 @@
 #include "..\Entities\Player.h"
 #include "..\Entities\Bullet.h"
 #include "..\Entities\AntiGrav.h"
+#include "..\Entities\Obstacle.h"
 #include "..\Map\Map.h"
 
 using namespace std;
@@ -33,13 +35,16 @@ private:
 	void translateView(float delta);
 
 	void setAntiGravPositions();
+	void setObstaclePositions();
 
 	void updatePlaying(float delta);
 	void updatePaused(float delta);
 	void updateDeathScreen(float delta);
+	void updateWinScreen(float delta);
 	
 	void drawPauseScreen()const;
 	void drawDeathScreen() const;
+	void drawWinScreen() const;
 
 	void resetGame();
 private:
@@ -48,17 +53,24 @@ private:
 	Player player_;
 	vector<Bullet> bullets_;
 	vector<AntiGrav> antiGravs_;
+	vector<Obstacle> obstacles_;
 	Map map_;
 	sf::Font font_;
 	sf::Text pauseText_;
 	sf::Text deathText_; 
+	sf::Text scoreText_;
+	sf::Text highscoreText_;
+	sf::Text winText_;
 	sf::Vector2f mouseWorldPos_;
-	sf::RectangleShape inverseGrav_;
+	sf::RectangleShape background_;
+	sf::Texture backgroundTexture_;
 	int gravity_ = 1;
 	int collTick_ = 0;
+	float score_;
+	float highscore_;
 	enum GameplayState
 	{
-		Playing, DeathScreen, Paused
+		Playing, DeathScreen, Paused, WinScreen
 	};
 	GameplayState gameplayState_;
 };

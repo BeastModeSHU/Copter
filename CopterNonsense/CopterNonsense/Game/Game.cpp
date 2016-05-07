@@ -93,12 +93,11 @@ void Game::run()
 		if (window_.isOpen())
 		{//prevents the window from updating post-closing & only run update when the user is in the game
 
-			if (lag > 2 * deltaTime)//clamp the 
-				lag = 2 * deltaTime;
+			if (lag > deltaTime)//clamp the 
+				lag = deltaTime;
 			//while (lag.asMilliseconds() >= MS_PER_UPDATE)
 			//while (lag >= deltaTime)
 			{
-
 				currentState_->update(dtime);
 				if (currentState_->isStateFinished())
 				{

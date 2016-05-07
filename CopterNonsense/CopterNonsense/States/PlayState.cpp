@@ -4,6 +4,7 @@
 PlayState::PlayState(sf::RenderWindow* rWin, sf::RenderTexture* rTex)
 	: State(Play, rWin, rTex)
 {
+	srand(time(NULL));
 	p_texMngr_ = TextureManager::instance();
 }
 
@@ -19,7 +20,7 @@ PlayState::~PlayState()
 
 bool PlayState::init()
 {
-	
+
 	antiGravs_.resize(GameConstants::Gameplay::MAX_ANTIGRAV);
 	for (int i(0); i < GameConstants::Gameplay::MAX_ANTIGRAV; ++i)
 	{
@@ -33,8 +34,8 @@ bool PlayState::init()
 	map_.generateMap();
 
 	p_objects_.push_back(new GameObject());
-
 	player_.setGameObject(p_objects_.back());
+
 	player_.initialise();
 	player_.setPosition(map_.getPlayerStartLocation());
 
@@ -47,13 +48,31 @@ bool PlayState::init()
 		bullets_[i].initialise();
 	}
 
+	obstacles_.resize(GameConstants::Gameplay::MAX_OBSTACLES);
+	for (int i(0); i < GameConstants::Gameplay::MAX_OBSTACLES; ++i)
+	{
+		p_objects_.push_back(new GameObject());
+		obstacles_[i].setGameObject(p_objects_.back());
+		obstacles_[i].initialise();
+	}
+
+	setObstaclePositions();
+
 	initViewPosition();
 
 	gameplayState_ = Playing;
 
 	if (!font_.loadFromFile("res//fonts//Seriphim.ttf"))
 		return(false);
+	if (!backgroundTexture_.loadFromFile("res//background.jpg"))
+		return(false);
+	backgroundTexture_.setRepeated(true);
 
+	background_.setSize(sf::Vector2f(GameConstants::Map::MAP_WIDTH * GameConstants::Map::TILESIZE, GameConstants::Window::WINDOW_HEIGHT));
+	background_.setScale(1, 1);
+	background_.setPosition(0, 0);
+	background_.setTexture(&backgroundTexture_);
+	background_.setTextureRect(sf::IntRect(0, 0, background_.getSize().x, background_.getSize().y));
 
 	pauseText_.setFont(font_);
 	pauseText_.setCharacterSize(72);
@@ -65,23 +84,39 @@ bool PlayState::init()
 	deathText_.setString("You died! R to retry");
 	deathText_.setColor(sf::Color::White);
 
+	winText_.setFont(font_);
+	winText_.setCharacterSize(72);
+	winText_.setString("WELL DONE M9!");
+	winText_.setColor(sf::Color::White);
 
-	//Debug purposes
-	/*sf::View v(p_rtexture_->getView());
-	v.zoom(10);
-	p_rtexture_->setView(v);*/
-	//Debug purposes
+	scoreText_.setFont(font_);
+	scoreText_.setCharacterSize(42);
+	scoreText_.setString(" SCORE : ");
+	scoreText_.setColor(sf::Color::White);
+	scoreText_.setPosition(p_rtexture_->mapPixelToCoords(sf::Vector2i(GameConstants::Window::WINDOW_WIDTH / 2, 0)));
+
+	highscoreText_.setFont(font_);
+	highscoreText_.setCharacterSize(28);
+	highscoreText_.setString("Current Highscore : " + std::to_string((int)highscore_));
+	highscoreText_.setColor(sf::Color::White);
+	highscoreText_.setPosition(p_rtexture_->mapPixelToCoords(sf::Vector2i(200, 0)));
+
+	score_ = 0;
+	highscore_ = 0;
+
 	return(true);
 }
 
 void PlayState::draw() const
 {
+	p_rtexture_->draw(background_);
+
 	for (GameObject* obj : p_objects_)
 		if (obj->getAlive())
 			p_rtexture_->draw(*obj);
 
 	p_rtexture_->draw(map_);
-
+	p_rtexture_->draw(scoreText_);
 
 	switch (gameplayState_)
 	{
@@ -91,13 +126,20 @@ void PlayState::draw() const
 	case DeathScreen:
 		drawDeathScreen();
 		break;
+	case WinScreen:
+		drawWinScreen();
+		break;
 	}
 }
 
 void PlayState::update(float delta)
 {
+	scoreText_.setString(" SCORE : " + std::to_string((int)score_));
+	highscoreText_.setString("Current Highscore : " + std::to_string((int)highscore_));
+	background_.move(-player_.getVelocity().x * 0.001, 0);
 	sf::Vector2i mousePos = sf::Mouse::getPosition(*p_window_);
 	mouseWorldPos_ = p_rtexture_->mapPixelToCoords(mousePos);
+
 	for (int i(0); i < GameConstants::Gameplay::MAX_BULLETS; ++i)
 	{
 		bullets_[i].update(delta);
@@ -119,6 +161,9 @@ void PlayState::update(float delta)
 	case DeathScreen:
 		updateDeathScreen(delta);
 		break;
+	case WinScreen:
+		updateWinScreen(delta);
+		break;
 	}
 
 }
@@ -126,25 +171,6 @@ void PlayState::update(float delta)
 void PlayState::handleEvent(const sf::Event& evnt)
 {
 	player_.events(evnt);
-
-	if (evnt.type == sf::Event::KeyPressed)
-	{
-		if (evnt.key.code == sf::Keyboard::M)
-		{
-			sf::Vector2f pos(player_.getPosition().x + player_.getGlobalBounds().width / 2, player_.getPosition().y + player_.getGlobalBounds().height / 2);
-			sf::Vector2f rot(subtract(mouseWorldPos_, pos));
-
-			bool found(false);
-			for (int i(0); i < GameConstants::Gameplay::MAX_BULLETS; ++i)
-			{
-				if (!bullets_[i].getAlive() && !found)
-				{
-					bullets_[i].setup(rot, pos);
-					found = true;
-				}
-			}
-		}
-	}
 
 	if (evnt.type == sf::Event::KeyPressed)
 	{
@@ -182,7 +208,18 @@ void PlayState::handleEvent(const sf::Event& evnt)
 		}
 	}
 	break;
-
+	case WinScreen:
+	{
+		if (evnt.type == sf::Event::KeyPressed)
+		{
+			if (evnt.key.code == sf::Keyboard::R)
+			{
+				resetGame();
+				gameplayState_ = Playing;
+			}
+		}
+	}
+	break;
 	}
 }
 
@@ -193,6 +230,7 @@ void PlayState::handleInput(float delta)
 	case Playing: break;
 	case Paused: break;
 	case DeathScreen: break;
+	case WinScreen: break;
 	}
 }
 
@@ -201,9 +239,16 @@ void PlayState::handleInput(float delta)
 //update related functions 
 void PlayState::updatePlaying(float delta)
 {
+	score_ += delta * 200;
+	scoreText_.move(player_.getVelocity().x * delta, 0);
+	if (score_ > highscore_)
+		highscore_ = score_;
+	highscoreText_.move(player_.getVelocity().x * delta, 0);
+
 	bool found(false);
 	for (int i(0); i < GameConstants::Gameplay::MAX_ANTIGRAV; ++i)
 	{
+		antiGravs_[i].update(map_.currentCol_);
 		if (player_.getGlobalBounds().intersects(antiGravs_[i].getGlobalBounds()))
 		{
 			found = true;
@@ -217,13 +262,24 @@ void PlayState::updatePlaying(float delta)
 	{
 		gravity_ = 1;
 	}
-	player_.update(delta,map_.currentCol_, gravity_);
+	player_.update(delta, map_.currentCol_, gravity_);
 	translateView(delta);
-	map_.lerpColours(delta, player_.getPosition());
+	map_.lerpColours(delta, player_.getPosition(), gravity_);
 
 	if (map_.isTerrainCollision(player_.getGlobalBounds()))
 	{
 		gameplayState_ = DeathScreen;
+	}
+	if (player_.getPosition().x > GameConstants::Map::MAP_WIDTH * GameConstants::Map::TILESIZE)
+	{
+		gameplayState_ = WinScreen;
+	}
+	//check for collisions with obstacles
+	for (int i(0); i < obstacles_.size(); ++i)
+	{
+		obstacles_[i].update(map_.currentCol_);
+		if (obstacles_[i].getGlobalBounds().intersects(player_.getGlobalBounds()))
+			gameplayState_ = DeathScreen;
 	}
 }
 
@@ -238,8 +294,18 @@ void PlayState::updatePaused(float delta)
 void PlayState::updateDeathScreen(float delta)
 {
 	sf::Vector2f centre(p_rtexture_->getView().getCenter());
-	centre -= sf::Vector2f(pauseText_.getGlobalBounds().width / 2.f, pauseText_.getGlobalBounds().height / 2.f);
+	centre -= sf::Vector2f(deathText_.getGlobalBounds().width / 2.f, deathText_.getGlobalBounds().height / 2.f);
 	deathText_.setPosition(centre);
+	scoreText_.setString("Your score was : " + std::to_string((int)score_));
+	scoreText_.setPosition(centre.x + 20, centre.y + 150);
+}
+void PlayState::updateWinScreen(float delta)
+{
+	sf::Vector2f centre(p_rtexture_->getView().getCenter());
+	centre -= sf::Vector2f(winText_.getGlobalBounds().width / 2.f, winText_.getGlobalBounds().height / 2.f);
+	winText_.setPosition(centre);
+	scoreText_.setString("Your score was : " + std::to_string((int)score_));
+	scoreText_.setPosition(centre.x + 20, centre.y + 150);
 }
 //end of update
 
@@ -253,6 +319,10 @@ void PlayState::drawDeathScreen() const
 {
 	p_rtexture_->draw(deathText_);
 }
+void PlayState::drawWinScreen() const
+{
+	p_rtexture_->draw(winText_);
+}
 //end of rendering
 
 
@@ -260,7 +330,7 @@ void PlayState::drawDeathScreen() const
 void PlayState::initViewPosition()
 {
 	sf::View view(p_rtexture_->getView());
-	float centreX(player_.getPosition().x + player_.getGlobalBounds().width / 2.f);
+	float centreX(((player_.getPosition().x) + 400) + player_.getGlobalBounds().width / 2.f);
 	//float centreY(player_.getPosition().y);
 
 	//view.setCenter(centreX, centreY);
@@ -281,11 +351,31 @@ void PlayState::translateView(float delta)
 void PlayState::setAntiGravPositions()
 {
 	int startX((rand() % 500) + 500);
-	int xJump((rand() % 750) + 2500);
+	int xJump((rand() % 750) + 4000);
 	for (int i(0); i < antiGravs_.size(); ++i)
 	{
-		antiGravs_[i].setPosition(sf::Vector2f(startX + (xJump * i) , 0));
-		xJump = rand() % 500 + 500;
+		antiGravs_[i].setPosition(sf::Vector2f(startX + (xJump * i), 0));
+		xJump = rand() % 750 + 2000;
+	}
+}
+
+void PlayState::setObstaclePositions()
+{
+	int startX((rand() % 500) + 1000);
+	int xJump((rand() % 750) + 1500);
+	int yPos(0);
+	int xPos(0);
+	for (int i(0); i < obstacles_.size(); ++i)
+	{
+		yPos = rand() % 400 + 100;
+		xPos = startX + (xJump * i);
+		obstacles_[i].setPosition(sf::Vector2f(xPos, yPos));
+		//while (map_.isTerrainCollision(obstacles_[i].getGlobalBounds()))
+		//{
+		//	yPos = rand() % 400 + 100;
+		//	obstacle_.setPosition(xPos, yPos);
+		//}
+		xJump = (rand() % 750) + 1500;
 	}
 }
 
@@ -295,7 +385,12 @@ void PlayState::resetGame()
 {
 	map_.generateMap();
 	player_.resetForce();
+	player_.resetVelocity();
 	player_.setPosition(map_.getPlayerStartLocation());
+	setAntiGravPositions();
+	setObstaclePositions();
+	scoreText_.setPosition(player_.getPosition().x, 0);
+	score_ = 0;
 	//sf::View v(p_rtexture_->getView());
 	//v.setCenter(player_.getPosition().x - player_.getGlobalBounds().width / 2.f, v.getCenter().y);
 	//p_rtexture_->setView(v);

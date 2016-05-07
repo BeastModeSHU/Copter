@@ -17,6 +17,7 @@ public:
 	void events(const sf::Event&);
 	void setPosition(sf::Vector2f);
 	void resetForce() { force_ = sf::Vector2f(0.f, 0.f); }
+	void resetVelocity() { velocity_.x = START_HORIZONTAL_SPEED; }
 	//Accessors
 	sf::Vector2f getPosition() const { return p_object_->getPosition(); };
 	sf::FloatRect getGlobalBounds() const;//{ return p_object_->getGlobalBounds(); }
@@ -33,6 +34,7 @@ private:
 	sf::Vector2f velocity_;
 	sf::Vector2f gravity_;
 	sf::Texture texture_;
+	sf::Texture reverseTexture_;
 	float mass_;
 	float invMass_;
 	bool verticalAllowed_; //Can the vehicle move vertically (for input detection)

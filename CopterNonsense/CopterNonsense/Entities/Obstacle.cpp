@@ -1,34 +1,36 @@
-#include "AntiGrav.h"
+#include "Obstacle.h"
 
-AntiGrav::AntiGrav()
+Obstacle::Obstacle()
 {
 }
 
-AntiGrav::~AntiGrav()
+Obstacle::~Obstacle()
 {
 }
 
-bool AntiGrav::initialise()
+bool Obstacle::initialise()
 {
-	int sx((rand() % 1000) + 400);
-	p_object_->setScale(sx, 720);
-	p_object_->setPosition(500, 0);
-	p_object_->setAlive(true);
-	if (!texture_.loadFromFile("res//antigrav.png"))
+
+	if (!texture_.loadFromFile("res//obstacle.png"))
 		return(false);
 	texture_.setRepeated(true);
+
+	p_object_->setScale(sf::Vector2f(25, (rand() % 100 + 75)));
+	p_object_->setPosition(0, 0);
+	p_object_->setAlive(true);
 	p_object_->setTexture(&texture_);
 	p_object_->setTextureRect(sf::FloatRect(0, 0, p_object_->getScale().x, p_object_->getScale().y));
+	//p_object_->setFillColor(sf::Color::Red);
 
 	return true;
 }
 
-void AntiGrav::update(const sf::Vector3f& col)
+void Obstacle::update(const sf::Vector3f& col)
 {
 	p_object_->setFillColor(sf::Color(col.x, col.y, col.z));
 }
 
-sf::FloatRect AntiGrav::getGlobalBounds() const
+sf::FloatRect Obstacle::getGlobalBounds() const
 {
 	sf::FloatRect bounds;
 	bounds.width = p_object_->getScale().x;
