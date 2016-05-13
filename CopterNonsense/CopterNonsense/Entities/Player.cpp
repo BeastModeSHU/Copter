@@ -35,7 +35,7 @@ bool Player::initialise()
 	return(true);
 }
 
-void Player::update(float delta, const sf::Vector3f& col, const int g)
+void Player::update(float delta, const sf::Vector3f& col, const int g, const bool started)
 {
 	if (g == 1)
 	{
@@ -47,16 +47,19 @@ void Player::update(float delta, const sf::Vector3f& col, const int g)
 		gravity_.y = -981;
 		p_object_->setTexture(&reverseTexture_);
 	}
-	
-	stepForces();
-	stepVelocity(delta);
-
-	p_object_->move(velocity_ * delta);
 	p_object_->setFillColor(sf::Color(col.x, col.y, col.z));
-	if (velocity_.x < MAX_HORIZONTAL_SPEED)
-		velocity_.x += 0.1f;
+	
+	if (started)
+	{
+		stepForces();
+		stepVelocity(delta);
 
-	force_ = sf::Vector2f(0.f, 0.f);	
+		p_object_->move(velocity_ * delta);
+		if (velocity_.x < MAX_HORIZONTAL_SPEED)
+			velocity_.x += 0.1f;
+
+		force_ = sf::Vector2f(0.f, 0.f);
+	}
 }
 
 void Player::events(const sf::Event& evnt)
