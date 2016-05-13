@@ -68,6 +68,7 @@ private:
 	int collTick_ = 0;
 	float score_;
 	float highscore_;
+	bool startGame_ = false;
 	enum GameplayState
 	{
 		Playing, DeathScreen, Paused, WinScreen

@@ -11,7 +11,7 @@ public:
 	//Mutators
 	bool initialise();
 	void setGameObject(GameObject* obj) { p_object_ = obj; }
-	void update(float dtime, const sf::Vector3f&, const int);
+	void update(float dtime, const sf::Vector3f&, const int, const bool);
 	void applyForce(sf::Vector2f force) { force_ += force; }
 	void setGravity(sf::Vector2f g) { gravity_ = g; }
 	void events(const sf::Event&);

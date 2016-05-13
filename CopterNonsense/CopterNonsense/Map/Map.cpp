@@ -42,9 +42,9 @@ void Map::generateMap()
 	initVertArray();
 }
 
-void Map::lerpColours(float delta, const sf::Vector2f& playerPos, const int g)
+void Map::lerpColours(float delta, const sf::Vector2f& playerPos)
 {
-	t_ += (delta / 2) * g;
+	t_ += (delta / 2);
 	if (needNewColour_)
 	{
 		startColour_ = endColour_;
@@ -110,23 +110,10 @@ void Map::lerpColours(float delta, const sf::Vector2f& playerPos, const int g)
 
 			}
 		}
-
-		if (g == 1)
+		if (colour == endColour_ || t_ > 1)
 		{
-			if (colour == endColour_ || t_ > 1)
-			{
-				needNewColour_ = true;
-				t_ = 0;
-			}
-
-		}
-		else
-		{
-			if (colour == startColour_ || t_ < -1)
-			{
-				needNewColour_ = true;
-				t_ = 0;
-			}
+			needNewColour_ = true;
+			t_ = 0;
 		}
 
 	}

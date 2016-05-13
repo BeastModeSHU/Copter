@@ -20,6 +20,7 @@ PlayState::~PlayState()
 
 bool PlayState::init()
 {
+	startGame_ = false;
 
 	antiGravs_.resize(GameConstants::Gameplay::MAX_ANTIGRAV);
 	for (int i(0); i < GameConstants::Gameplay::MAX_ANTIGRAV; ++i)
@@ -68,9 +69,9 @@ bool PlayState::init()
 		return(false);
 	backgroundTexture_.setRepeated(true);
 
-	background_.setSize(sf::Vector2f(GameConstants::Map::MAP_WIDTH * GameConstants::Map::TILESIZE, GameConstants::Window::WINDOW_HEIGHT));
+	background_.setSize(sf::Vector2f(GameConstants::Map::MAP_WIDTH * GameConstants::Map::TILESIZE * 2, GameConstants::Window::WINDOW_HEIGHT));
 	background_.setScale(1, 1);
-	background_.setPosition(0, 0);
+	background_.setPosition(-400, 0);
 	background_.setTexture(&backgroundTexture_);
 	background_.setTextureRect(sf::IntRect(0, 0, background_.getSize().x, background_.getSize().y));
 
@@ -93,7 +94,7 @@ bool PlayState::init()
 	scoreText_.setCharacterSize(42);
 	scoreText_.setString(" SCORE : ");
 	scoreText_.setColor(sf::Color::White);
-	scoreText_.setPosition(p_rtexture_->mapPixelToCoords(sf::Vector2i(GameConstants::Window::WINDOW_WIDTH / 2, 0)));
+	scoreText_.setPosition(player_.getPosition().x, 0);
 
 	highscoreText_.setFont(font_);
 	highscoreText_.setCharacterSize(28);
@@ -134,38 +135,45 @@ void PlayState::draw() const
 
 void PlayState::update(float delta)
 {
-	scoreText_.setString(" SCORE : " + std::to_string((int)score_));
-	highscoreText_.setString("Current Highscore : " + std::to_string((int)highscore_));
-	background_.move(-player_.getVelocity().x * 0.001, 0);
-	sf::Vector2i mousePos = sf::Mouse::getPosition(*p_window_);
-	mouseWorldPos_ = p_rtexture_->mapPixelToCoords(mousePos);
-
-	for (int i(0); i < GameConstants::Gameplay::MAX_BULLETS; ++i)
+	if (!startGame_)
 	{
-		bullets_[i].update(delta);
-		if (map_.isTerrainCollision(bullets_[i].getGlobalBounds()) && bullets_[i].getAlive())
+		player_.update(delta, map_.currentCol_, gravity_, startGame_);
+		map_.lerpColours(delta, player_.getPosition());
+		for (int i(0); i < GameConstants::Gameplay::MAX_ANTIGRAV; ++i)
 		{
-			bullets_[i].setAlive(false);
+			antiGravs_[i].update(map_.currentCol_);
 		}
 	}
-
-
-	switch (gameplayState_)
+	else if (startGame_)
 	{
-	case Playing:
-		updatePlaying(delta);
-		break;
-	case Paused:
-		updatePaused(delta);
-		break;
-	case DeathScreen:
-		updateDeathScreen(delta);
-		break;
-	case WinScreen:
-		updateWinScreen(delta);
-		break;
-	}
+		scoreText_.setString(" SCORE : " + std::to_string((int)score_));
+		highscoreText_.setString("Current Highscore : " + std::to_string((int)highscore_));
+		background_.move(-player_.getVelocity().x * 0.0001, 0);
+		sf::Vector2i mousePos = sf::Mouse::getPosition(*p_window_);
+		mouseWorldPos_ = p_rtexture_->mapPixelToCoords(mousePos);
+		map_.lerpColours(delta, player_.getPosition());
 
+		for (int i(0); i < GameConstants::Gameplay::MAX_ANTIGRAV; ++i)
+			antiGravs_[i].update(map_.currentCol_);
+		for (int i(0); i < GameConstants::Gameplay::MAX_OBSTACLES; ++i)
+			obstacles_[i].update(map_.currentCol_);
+
+		switch (gameplayState_)
+		{
+		case Playing:
+			updatePlaying(delta);
+			break;
+		case Paused:
+			updatePaused(delta);
+			break;
+		case DeathScreen:
+			updateDeathScreen(delta);
+			break;
+		case WinScreen:
+			updateWinScreen(delta);
+			break;
+		}
+	}
 }
 
 void PlayState::handleEvent(const sf::Event& evnt)
@@ -186,7 +194,14 @@ void PlayState::handleEvent(const sf::Event& evnt)
 	{
 	case Playing:
 	{
-
+		if (evnt.type == sf::Event::KeyPressed)
+		{
+			if (evnt.key.code == sf::Keyboard::Space)
+			{
+				if (!startGame_)
+					startGame_ = true;
+			}
+		}
 	}
 	break;
 
@@ -248,7 +263,6 @@ void PlayState::updatePlaying(float delta)
 	bool found(false);
 	for (int i(0); i < GameConstants::Gameplay::MAX_ANTIGRAV; ++i)
 	{
-		antiGravs_[i].update(map_.currentCol_);
 		if (player_.getGlobalBounds().intersects(antiGravs_[i].getGlobalBounds()))
 		{
 			found = true;
@@ -262,9 +276,8 @@ void PlayState::updatePlaying(float delta)
 	{
 		gravity_ = 1;
 	}
-	player_.update(delta, map_.currentCol_, gravity_);
+	player_.update(delta, map_.currentCol_, gravity_, startGame_);
 	translateView(delta);
-	map_.lerpColours(delta, player_.getPosition(), gravity_);
 
 	if (map_.isTerrainCollision(player_.getGlobalBounds()))
 	{
@@ -384,6 +397,8 @@ void PlayState::setObstaclePositions()
 void PlayState::resetGame()
 {
 	map_.generateMap();
+	startGame_ = false;
+	gravity_ = 1;
 	player_.resetForce();
 	player_.resetVelocity();
 	player_.setPosition(map_.getPlayerStartLocation());
