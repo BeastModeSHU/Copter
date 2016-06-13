@@ -87,9 +87,8 @@ void Map::lerpColours(float delta, const sf::Vector2f& playerPos)
 	{
 		sf::Vector3f colour = startColour_ + t_ * (endColour_ - startColour_);
 		currentCol_ = colour;
-		sf::Vector2i pos(playerPos.x / TILESIZE, playerPos.y / TILESIZE);
+		sf::Vector2i pos(static_cast<int>(playerPos.x / TILESIZE), static_cast<int>(playerPos.y / TILESIZE));
 
-		//for (size_t i(pos.x - 10); i < pos.x + 10; ++i)
 		for (size_t i(0); i < MAP_WIDTH; ++i)
 		{
 			for (size_t j(0); j < MAP_HEIGHT; ++j)
@@ -146,8 +145,8 @@ void Map::setupBlockedMap()
 
 	int lastY = minY + maxY / 2; //set the start location of the crawler to the mid-point between min and max y 
 
-	playerStart_.x = 0; //Set the player's x to 0
-	playerStart_.y = lastY * TILESIZE; //Set their y location to the start y value
+	playerStart_.x = 0.f; //Set the player's x to 0
+	playerStart_.y = static_cast<float>(lastY * TILESIZE); //Set their y location to the start y value
 
 	//set the start tile to unblocked
 	blockedMap_[0][lastY] = FREE_TILE;
@@ -312,15 +311,15 @@ bool Map::isCollidingWithMap(const sf::FloatRect& collider) const
 	pos.x = static_cast<int> (collider.left / TILESIZE);
 	pos.y = static_cast<int> (collider.top / TILESIZE);
 
-	for (size_t i(0); i < DIREC_SIZE; ++i)
+	for (size_t i(0); i < static_cast<size_t>(DIREC_SIZE); ++i)
 	{
 		tileToCheck = pos + DIRECTIONS[i];
 
 		if (tileToCheck.x >= 0 && tileToCheck.x < MAP_WIDTH &&
 			tileToCheck.y >= 0 && tileToCheck.y < MAP_HEIGHT)
 		{
-			r.left = tileToCheck.x * TILESIZE;
-			r.top = tileToCheck.y * TILESIZE;
+			r.left = static_cast<float>(tileToCheck.x * TILESIZE);
+			r.top = static_cast<float>(tileToCheck.y * TILESIZE);
 
 			if (blockedMap_[tileToCheck.x][tileToCheck.y] == BLOCKED_TILE && r.intersects(collider))
 				return (true);

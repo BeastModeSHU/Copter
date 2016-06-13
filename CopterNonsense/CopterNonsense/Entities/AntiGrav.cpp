@@ -1,31 +1,24 @@
 #include "AntiGrav.h"
 
-AntiGrav::AntiGrav()
-{
-}
-
-AntiGrav::~AntiGrav()
-{
-}
-
 bool AntiGrav::initialise()
 {
-	int sx((rand() % 1000) + 400);
-	p_object_->setScale(sx, 720);
-	p_object_->setPosition(500, 0);
-	p_object_->setAlive(true);
-	if (!texture_.loadFromFile("res//antigrav.png"))
+	if (!texture_.loadFromFile("res//antigrav.png")) //Try and load the texture, if it fails return false
 		return(false);
-	texture_.setRepeated(true);
-	p_object_->setTexture(&texture_);
+	texture_.setRepeated(true); //Repeat the texture across the object
+
+	int sx((rand() % 1000) + 400); //Get a random value for its x-scale
+	p_object_->setScale(sx, 720);  //Set the scale of the object
+	p_object_->setPosition(500, 0); //Set its position
+	p_object_->setAlive(true); 
+	p_object_->setTexture(&texture_); //Set the texture of the object
 	p_object_->setTextureRect(sf::FloatRect(0, 0, p_object_->getScale().x, p_object_->getScale().y));
 
-	return true;
+	return(true);
 }
 
 void AntiGrav::update(const sf::Vector3f& col)
 {
-	p_object_->setFillColor(sf::Color(col.x, col.y, col.z));
+	p_object_->setFillColor(sf::Color(col.x, col.y, col.z)); //Change the colour of this object to the colour of the map (Which is being lerped)
 }
 
 sf::FloatRect AntiGrav::getGlobalBounds() const
@@ -35,7 +28,5 @@ sf::FloatRect AntiGrav::getGlobalBounds() const
 	bounds.height = p_object_->getScale().y;
 	bounds.left = (p_object_->getPosition().x + (p_object_->getGlobalBounds().width / 2.f)) - bounds.width / 2.f;
 	bounds.top = (p_object_->getPosition().y + (p_object_->getGlobalBounds().height / 2.f)) - bounds.height / 2.f;
-	/*bounds.left = (p_object_->getPosition().x - bounds.width / 2.f);
-	bounds.top = (p_object_->getPosition().y - bounds.height / 2.f);*/
 	return(bounds);
 }

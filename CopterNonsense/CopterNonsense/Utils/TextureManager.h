@@ -21,7 +21,7 @@ private:
 	static TextureManager* p_manager_; 
 	bool isInList(const std::string& name)
 	{//if there's a texture with a given name in the cache return true else false
-		for (int i(0); i < assetCache_.size(); ++i)
+		for (int i(0); i < static_cast<int>(assetCache_.size()); ++i)
 			if (assetCache_[i].name == name)
 				return(true);
 		return(false);

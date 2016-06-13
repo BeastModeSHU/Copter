@@ -23,7 +23,8 @@ public:
 	virtual void handleInput(float) = 0;
 	virtual int nextStateID() const = 0;
 
-	void endState() { completed_ = true; }
+	virtual void endState() { completed_ = true; }
+	void resetState() { completed_ = false; }
 
 	bool isStateFinished() const { return completed_; }
 	StateType getStateType() const { return type_; }

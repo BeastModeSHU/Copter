@@ -45,9 +45,6 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Entities\Bullet.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Entities\AntiGrav.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -87,9 +84,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Map\Map.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Entities\Bullet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Entities\AntiGrav.h">
